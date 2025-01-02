@@ -203,7 +203,6 @@ PAMH_ARG_DECL(int get_account_info,
 	if (*pwd != NULL) {
 		if (strcmp((*pwd)->pw_passwd, "*NP*") == 0)
 		{ /* NIS+ */
-#ifdef HELPER_COMPILE
 			uid_t save_euid, save_uid;
 
 			save_euid = geteuid();
@@ -236,12 +235,8 @@ PAMH_ARG_DECL(int get_account_info,
 
 			if (*spwdent == NULL || (*spwdent)->sp_pwdp == NULL)
 				return PAM_AUTHINFO_UNAVAIL;
-#else
-			/* we must run helper for NIS+ passwords */
-			return PAM_UNIX_RUN_HELPER;
-#endif
+
 		} else if (is_pwd_shadowed(*pwd)) {
-#ifdef HELPER_COMPILE
 			/*
 			 * shadow password file entry for this user,
 			 * if shadowing is enabled
@@ -249,13 +244,6 @@ PAMH_ARG_DECL(int get_account_info,
 			*spwdent = getspnam(name);
 			if (*spwdent == NULL || (*spwdent)->sp_pwdp == NULL)
 				return PAM_AUTHINFO_UNAVAIL;
-#else
-			/*
-			 * The helper has to be invoked to deal with
-			 * the shadow password file entry.
-			 */
-			return PAM_UNIX_RUN_HELPER;
-#endif
 		}
 	} else {
 		return PAM_USER_UNKNOWN;
